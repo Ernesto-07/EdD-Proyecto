@@ -74,15 +74,7 @@ Use Merge Sort como algoritmo de ordenamiento tras analizar su eficiencia con la
 
 ---
 
-### SICT0302: Toma decisiones
-
-Para organizar la tabla de posiciones se seleccionó **Merge Sort** como algoritmo de ordenamiento debido a que garantiza un rendimiento estable de $O(n \log n)$ independientemente de si los puntajes de los jugadores ingresados están previamente ordenados, en orden inverso o desordenados.
-
-A diferencia de algoritmos simples como Bubble Sort o Insertion Sort, Merge Sort mantiene su eficiencia optimizada para escalar adecuadamente ante un número elevado de registros.
-
----
 
 ## Créditos y Reconocimientos
 
-* **Estructura Base y Algoritmo de Ordenamiento:** Desarrollo realizado para la materia utilizando la plantilla genérica MergeSort.
-* **Lógica del Juego (`game.h`):** El módulo del juego de navegación espacial fue desarrollado íntegramente con la asistencia y co-creación de **Gemini (Modelo de IA de Google)** como herramienta de apoyo para el desarrollo interactivo en consola C++.
+* **Lógica del Juego (`game.h`):** El codigo del juego fue hecho 100% con Gemini, solo el juego que el profesor me dijo que podia investigar y dar creditos a quien corresponde.
