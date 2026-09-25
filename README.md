@@ -2,14 +2,14 @@
 
 ## Descripción del avance
 
-En este proyecto desarrollamos un programa interactivo en C++ para jugar una misión de navegación espacial y almacenar los puntajes de los jugadores en una tabla de posiciones ordenada. El programa utiliza una clase `Player` para almacenar los datos principales de cada participante:
+En este proyecto hice un programa para jugar una misión de navegación espacial y guardar los puntajes de los jugadores en una tabla de posiciones ordenada. El programa utiliza una clase `Player` para almacenar los datos principales de cada participante:
 
 * **Nombre del Jugador** (`string`)
 * **Puntuación Obtenida** (`int`)
 
 La información de los jugadores se registra dinámicamente en un `vector`. El programa permite jugar partidas individuales, registrar los resultados obtenidos y visualizarlos en una tabla ordenada de mayor a menor puntaje.
 
-Para realizar el ordenamiento se implementó el algoritmo **Merge Sort**, utilizando programación genérica mediante la clase plantilla `Sorts<T>`. El algoritmo ordena a los jugadores comparando sus puntajes mediante la sobrecarga del operador `>=`.
+Para realizar el ordenamiento se implementó el algoritmo **Merge Sort**, mediante la clase `Sorts<T>`. El algoritmo ordena a los jugadores comparando sus puntajes mediante la sobrecarga del operador `>=`.
 
 El programa está dividido en archivos para mantener una estructura modular limpia:
 
@@ -36,7 +36,7 @@ Selecciona una opcion:
 Al seleccionar la opción 1, el programa solicita el nombre del jugador e inicia la partida de navegación espacial. 
 
 **Mecánica ligera del juego:**
-El jugador controla una nave `[^]` en un mapa espacial de 8x8 e intenta llegar a la estación base `(H)` usando los controles `w`, `a`, `s`, `d`. El objetivo es completar la misión utilizando la menor cantidad de movimientos posible. Entre más combustible ahorre el jugador, mayor será el puntaje calculado al llegar a la base.
+El jugador controla una nave `[^]` en un mapa espacial e intenta llegar a la estación base `(H)` usando los controles `w`, `a`, `s`, `d`. El objetivo es completar la misión utilizando la menor cantidad de movimientos posible. Entre más combustible ahorre el jugador, mayor será el puntaje calculado al llegar a la base.
 
 ### 2. Ver Leaderboard
 Al seleccionar la opción 2, el programa toma el vector con todos los jugadores registrados, ejecuta el algoritmo **Merge Sort** para ordenarlos por su puntaje de forma descendente y despliega la tabla de posiciones en pantalla.
@@ -75,7 +75,7 @@ El análisis de complejidad detallado también se encuentra indicado directament
 
 Para organizar la tabla de posiciones se seleccionó **Merge Sort** como algoritmo de ordenamiento debido a que garantiza un rendimiento estable de $O(n \log n)$ independientemente de si los puntajes de los jugadores ingresados están previamente ordenados, en orden inverso o desordenados.
 
-A diferencia de algoritmos simples como Bubble Sort o Insertion Sort (que degeneran a $O(n^2)$ en el peor de los casos), Merge Sort mantiene su eficiencia optimizada para escalar adecuadamente ante un número elevado de registros.
+A diferencia de algoritmos simples como Bubble Sort o Insertion Sort, Merge Sort mantiene su eficiencia optimizada para escalar adecuadamente ante un número elevado de registros.
 
 ---
 
