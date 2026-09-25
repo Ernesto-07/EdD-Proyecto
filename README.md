@@ -68,6 +68,9 @@ La función `mergeSort` realiza la llamada inicial dividiendo el vector mediante
 La combinación mediante `mergeArray` recorre los elementos de ambas partes para colocarlos en orden en el arreglo temporal, teniendo una complejidad lineal de $O(n)$. Por lo tanto, al combinar los $\log n$ niveles con el trabajo de $O(n)$ por nivel, la complejidad total del algoritmo es $O(n \log n)$ en todos sus casos.
 
 El análisis de complejidad detallado también se encuentra indicado directamente en `scores.h` mediante comentarios línea por línea.
+### SICT0302: Toma decisiones
+
+Use Merge Sort como algoritmo de ordenamiento tras analizar su eficiencia con las demás opciones disponibles. A diferencia de algoritmos elementales como Bubble Sort, Selection Sort e Insertion Sort, Merge Sort me da un rendimiento de $O(n \log n)$. Merge Sort manteniene una complejidad constante de $O(n \log n)$ en el mejor, promedio y peor caso, lo que da un comportamiento predecible e independiente de la disposición inicial de los puntajes. Preferi Merge Sort por ser un algoritmo estable, lo cual permite conservar el orden de registro cuando dos jugadores obtienen exactamente la misma puntuación. Lo que quiero decir es que Merge Sort es la alternativa más confiable y escalable para la gestión del leaderboard.
 
 ---
 
