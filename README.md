@@ -34,7 +34,7 @@ Cada participante se representa con la clase `Player`, que contiene:
 1. Se agregó `busquedas.h` con `bs_seq`, `bs_aux` y `bs_rec`.
 2. Se agregó la función `cargarArchivo` en `main.cpp`, que lee `jugadores.txt`.
 3. El menú pasó de 4 a 6 opciones: se agregaron las búsquedas (4 y 5) y **Salir** pasó a ser la opción 6.
-4. `Historial` dejó de usar sobrescritura directa y ahora usa operaciones explícitas de fila (`enqueue`, `dequeue`, `front`, etc.).
+4. `Historial` ahora usa operaciones de fila (`enqueue`, `dequeue`, `front`, etc.).
 
 ---
 
@@ -51,14 +51,11 @@ Cada participante se representa con la clase `Player`, que contiene:
 Una línea por jugador, con el formato `nombre puntaje` (el nombre sin espacios):
 
 ```
-Ana 2350
-Luis 1450
-Maria 1000
-Pedro 0
+Ernesto 2350
+Lalo 1450
+Julio 1000
+Raul 0
 ```
-
-El archivo se abre con ruta relativa, por lo que debe estar en la carpeta **desde donde se ejecuta el programa**. Si no existe, el programa inicia con la lista vacía.
-
 ---
 
 ## ¿Cómo usar el programa?
