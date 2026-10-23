@@ -87,12 +87,12 @@ Selecciona una opcion:
 
 ### Compilación
 ```bash
-g++ -std=c++17 main.cpp -o avance3
+g++ -std=c++17 main.cpp -o avance2
 ```
 
 ### Ejecución
 ```bash
-./avance3
+./avance2
 ```
 (En Windows: `avance3.exe`). Asegúrate de que `jugadores.txt` esté en la carpeta desde la que ejecutas.
 
