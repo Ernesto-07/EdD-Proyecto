@@ -17,7 +17,7 @@ Cada participante se representa con la clase `Player`, que contiene:
 - Lógica del juego interactivo en consola dentro de `game.h`.
 
 ## Descripción del Avance 2
-- Se incorporó una **Fila** (estructura FIFO) de capacidad fija (`MAX_HISTORIAL = 5`) dentro de la clase `Historial` (`historial.h`), que guarda las últimas 5 partidas.
+- Se incorporó una **Fila** de capacidad fija (`MAX_HISTORIAL = 5`) dentro de la clase `Historial` (`historial.h`), que guarda las últimas 5 partidas.
 - La fila se implementó como un arreglo circular con los atributos `head`, `tail` y `counter`, y las operaciones `enqueue`, `dequeue`, `front`, `empty`, `full` y `clear`.
 - Cuando la fila está llena, `add()` hace `dequeue()` de la partida más antigua y después `enqueue()` de la nueva.
 
