@@ -139,7 +139,7 @@ El único algoritmo de ordenamiento del proyecto es **Merge Sort** (`scores.h`),
 | `mergeSplit` | Divide la lista en dos mitades, ordena cada una recursivamente y las mezcla | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
 | `mergeSort` | Llama a `mergeSplit` | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
 
-* **Explicación:** En cada llamada, dividir la lista cuesta $O(n)$ y mezclar cuesta $O(n)$. Cada nivel de recursión divide el tamaño a la mitad, así que hay $\log n$ niveles: $T(n) = 2T(n/2) + O(n) = O(n \log n)$.
+* **Explicación:** En cada llamada, dividir la lista cuesta $O(n)$ y mezclar cuesta $O(n)$.
 * **Consistencia:** El tiempo no depende del orden inicial de los datos (la lista siempre se divide y se mezcla completa), por eso los tres casos son iguales.
 * **Espacio extra:** $O(n)$ por las listas auxiliares que se crean al dividir y mezclar, más $O(\log n)$ de pila de recursión.
 * **Dónde se observa:** `scores.h`, con el análisis línea por línea en los comentarios.
