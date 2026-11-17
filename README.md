@@ -2,172 +2,262 @@
 
 **Autor:** Ernesto Beltran
 
-## Descripción General del Proyecto
-Este proyecto es un juego de consola en C++ en el que el jugador controla una nave en una cuadrícula $8 \times 8$ y debe llegar a la base antes de quedarse sin combustible. Las puntuaciones se guardan en estructuras de datos y se pueden consultar mediante un leaderboard ordenado, un historial de partidas recientes y dos tipos de búsqueda.
+---
 
-Cada participante se representa con la clase `Player`, que contiene:
-- Nombre del jugador (`string`)
-- Puntuación obtenida (`int`)
+## Descripción general
+
+Este proyecto es un juego de consola en C++ donde controlas una nave en una cuadrícula de `8x8` y tienes que llegar a la base antes de quedarte sin combustible.
+
+Los resultados de todas las partidas se van guardando en una estructura de datos dinámica, se ordenan para armar un *leaderboard*, se pueden consultar de distintas formas y se guardan en un archivo de texto (`jugs.txt`) para que no se pierdan al cerrar el programa.
+
+Cada partida se representa con la clase `Player`, que guarda:
+* **Nombre del jugador** (`string`)
+* **Puntuación obtenida** (`int`)
 
 ---
 
-## Descripción del Avance 1
-- Registro de puntuaciones en un `std::vector<Player>`.
-- Ordenamiento del leaderboard de mayor a menor puntaje con la clase `Sorts<T>`, usando **Merge Sort** y la sobrecarga del operador `>=`.
-- Lógica del juego interactivo en consola dentro de `game.h`.
+## Evolución del proyecto
 
-## Descripción del Avance 2
-- Se incorporó una **Fila** de capacidad fija (`MAX_HISTORIAL = 5`) dentro de la clase `Historial` (`historial.h`), que guarda las últimas 5 partidas.
-- La fila se implementó como un arreglo circular con los atributos `head`, `tail` y `counter`, y las operaciones `enqueue`, `dequeue`, `front`, `empty`, `full` y `clear`.
-- Cuando la fila está llena, `add()` hace `dequeue()` de la partida más antigua y después `enqueue()` de la nueva.
+### Avance 1
+* Guardado de las puntuaciones en un `vector<Player>`.
+* Ordenamiento del *leaderboard* de mayor a menor puntaje usando la clase `Sorts<T>` con Merge Sort y la sobrecarga del operador `>=` de `Player`.
+* Lógica del juego interactivo en consola (`game.h`).
 
-## Descripción del Avance 3 (actual)
-- **Búsquedas** (`busquedas.h`):
-  - `bs_rec` / `bs_aux`: búsqueda binaria **recursiva** por puntaje sobre el leaderboard ordenado con Merge Sort.
-  - `bs_seq`: búsqueda **secuencial** por nombre sobre la lista sin ordenar.
-- **Lectura de archivo:** al iniciar, el programa carga los jugadores de `jugadores.txt` al `vector<Player>`.
-- **Análisis de complejidad** comentado en todas las funciones.
+### Avance 2
+* Agregué un historial de las últimas 5 partidas (`historial.h`) usando una fila circular de capacidad fija (`enqueue`, `dequeue`, `front`, `empty`, `full`, `clear`).
+* Agregué `busquedas.h` con búsqueda binaria recursiva por puntaje y búsqueda secuencial por nombre.
+* Implementé la lectura de archivo (`cargarArchivo`) para cargar las partidas guardadas al iniciar el programa.
+* El menú pasó de 4 a 6 opciones.
+
+**Cambios respecto al Avance 1:**
+1. **Historial con fila circular:** Para ver las últimas partidas jugadas. Usé una fila porque la más antigua debe ir saliendo primero (FIFO).
+2. **Búsquedas (`busquedas.h`):** Para consultar partidas por puntaje o por nombre, además del *leaderboard*.
+3. **Lectura de archivo:** Para mantener las partidas de sesiones anteriores al volver a abrir el programa.
+4. **Menú de 6 opciones:** Se agregaron el historial y las dos búsquedas.
+
+### Avance 3 (Actual)
+En este avance ya tengo la aplicación completa funcionando: carga datos, los organiza, permite hacer consultas y guarda todo automáticamente.
+
+* **Cambio de estructura de datos:** Reemplacé el `vector<Player>` y la fila circular del historial por una sola lista doblemente ligada (`DList<Player>` en `dlist.h`), recorrida con un iterador (`DListIterator`). Esta única lista guarda todas las partidas en orden cronológico y de ahí salen el *leaderboard*, el historial y las búsquedas (ya no se usa `enqueue` ni fila).
+* **Merge Sort sobre la lista:** Adapté `Sorts<T>` para ordenar `DList<T>` dividiendo la lista en dos mitades, ordenando cada una y mezclándolas con iteradores.
+* **Escritura de archivo:** Después de cada partida, `guardarArchivo` escribe en `jugs.txt` todas las partidas actuales de la lista.
+* **Consultas:** *Leaderboard* (Top 10), historial reciente, partidas de un jugador por nombre y búsqueda por puntaje.
+* **Validación de entradas:** Si en el menú se escribe una letra o algo que no sea un número, el programa avisa y vuelve a preguntar sin ciclarse.
+* **Análisis de complejidad:** Documenté la complejidad de todos los componentes y la complejidad final del programa (ver sección de competencias).
+
+**Cambios respecto al Avance 2:**
+1. **Lista doblemente ligada en lugar de vector y fila circular:** La fila era de tamaño fijo (5) y solo servía para el historial, además de que tener dos estructuras separadas duplicaba los datos. Con la lista doblemente ligada todo vive en un solo lugar, crece dinámicamente nodo por nodo sin tener que redimensionar ni copiar arreglos, y agrega al final en $O(1)$ gracias al puntero `tail`.
+2. **Eliminación de `historial.h`:** Ahora el historial simplemente toma las últimas 5 partidas de la lista. Como la lista se carga desde el archivo, el historial también muestra partidas de ejecuciones anteriores (antes solo mostraba las de la sesión actual).
+3. **Eliminación de la búsqueda binaria:** La búsqueda binaria necesita saltar directo a la mitad de los datos, pero en una lista ligada llegar al elemento de en medio cuesta $O(n)$, así que dejaba de ser $O(\log n)$. Cambié a búsqueda secuencial.
+4. **Búsqueda por nombre completa:** Ahora muestra todas las partidas de un jugador y no solo la primera que encontraba, para que pueda ver todo su historial.
+5. **Leaderboard limitado al Top 10:** Antes mostraba todas las partidas; ahora muestra únicamente las 10 mejores puntuaciones.
+6. **Guardado automático (`guardarArchivo`):** Antes el programa solo leía `jugs.txt` y las partidas nuevas se perdían al cerrar.
+7. **Corrección en la complejidad del historial:** Imprimir el historial cuesta $O(n)$ y no $O(1)$, porque hay que recorrer la lista para llegar a los últimos 5 nodos.
+8. **Validación en el menú (`leerEntero`):** Evita que el programa entre en un ciclo infinito si el usuario escribe texto en lugar de un número.
+9. **Reordenamiento del menú:** La opción 4 ahora es buscar por nombre y la 5 buscar por puntaje.
+
+### Entrega final
+*(Pendiente: se completará en la entrega final).*
+
+**Cambios respecto al Avance 3:**
+*(Pendiente: se completará en la entrega final).*
 
 ---
 
-## Cambios con respecto al avance anterior
-1. Se agregó `busquedas.h` con `bs_seq`, `bs_aux` y `bs_rec`.
-2. Se agregó la función `cargarArchivo` en `main.cpp`, que lee `jugadores.txt`.
-3. El menú pasó de 4 a 6 opciones: se agregaron las búsquedas (4 y 5) y **Salir** pasó a ser la opción 6.
-4. `Historial` ahora usa operaciones de fila (`enqueue`, `dequeue`, `front`, etc.).
+## Compilación y ejecución
 
----
-
-## Estructura y Archivos del Proyecto
-- `main.cpp`: menú principal, flujo del programa, carga del archivo, registro de jugadores y consultas.
-- `player.h`: clase `Player` (nombre y puntaje), getters y sobrecarga de `>=`.
-- `scores.h`: clase plantilla `Sorts<T>` con **Merge Sort**.
-- `game.h`: lógica del juego de navegación espacial y cálculo del puntaje.
-- `historial.h`: clase `Historial`, que implementa la **Fila** circular de las últimas 5 partidas.
-- `busquedas.h`: búsqueda binaria recursiva (`bs_rec`, `bs_aux`) y búsqueda secuencial (`bs_seq`).
-- `jugadores.txt`: datos iniciales de jugadores.
-
-### Formato de `jugadores.txt`
-Una línea por jugador, con el formato `nombre puntaje` (el nombre sin espacios):
-
+### Compilar
+Ejecuta el siguiente comando en la terminal dentro de la carpeta del proyecto:
+```bash
+g++ main.cpp -std=c++11 -o final
 ```
-Ernesto 2350
-Lalo 1450
-Julio 1000
-Raul 0
-```
+
+### Ejecutar
+* **Linux / Mac:**
+  ```bash
+  ./final
+  ```
+* **Windows:**
+  ```bash
+  final.exe
+  ```
+
+> **Nota:** El archivo `jugs.txt` debe estar en la carpeta desde la que se ejecuta el programa. Si todavía no existe, el programa empieza con la lista vacía y lo crea automáticamente al terminar la primera partida.
+
 ---
 
 ## ¿Cómo usar el programa?
 
-Al ejecutar el programa se muestra el menú principal:
+Al ejecutar el programa aparece el menú principal en consola:
 
-```
- MENU PRINCIPAL
+```text
+ MENU PRINCIPAL 
 1. Jugar
 2. Ver Leaderboard
 3. Ver Historial reciente
-4. Buscar por puntaje (binaria)
-5. Buscar por nombre (secuencial)
+4. Buscar partidas por nombre
+5. Buscar por puntaje
 6. Salir
-Selecciona una opcion:
+Selecciona una opcion: 
 ```
 
-### Opciones del menú
-1. **Jugar:** pide el nombre e inicia la partida. El jugador controla una nave `[^]` en una cuadrícula de $8 \times 8$ y debe llegar a la base `(H)` con `w`, `a`, `s`, `d`, con 15 movimientos de combustible. Si llega, el puntaje es `movimientos restantes * 150 + 1000`; si no, es 0. El jugador se guarda en el vector y en el historial.
-2. **Ver Leaderboard:** ordena con Merge Sort a todos los jugadores (incluidos los cargados del archivo) de mayor a menor puntaje y muestra la tabla.
-3. **Ver Historial reciente:** muestra las últimas 5 partidas jugadas en esta ejecución, de la más antigua a la más reciente. Los jugadores cargados del archivo no aparecen aquí.
-4. **Buscar por puntaje:** ordena la lista y aplica búsqueda binaria recursiva. Si varios jugadores tienen el mismo puntaje, los muestra todos.
-5. **Buscar por nombre:** busca secuencialmente en la lista y muestra el primer jugador con ese nombre.
-6. **Salir:** muestra un mensaje de despedida y termina el programa.
+1. **Jugar:** Te pide tu nombre y empieza la partida. Controlas la nave `[^]` en una cuadrícula de `8x8` y debes llegar a la base `(H)` usando las teclas `w`, `a`, `s`, `d` con un límite de 15 movimientos de combustible. Si llegas, el puntaje es `movimientos_restantes * 150 + 1000`; si te quedas sin combustible, es `0`. Al terminar, la partida se agrega a la lista y se guarda en `jugs.txt`.
+2. **Ver Leaderboard:** Ordena una copia de todas las partidas con Merge Sort y muestra el Top 10 de mayor a menor puntaje.
+3. **Ver Historial reciente:** Muestra las últimas 5 partidas registradas, de la más vieja a la más reciente (incluyendo las cargadas del archivo).
+4. **Buscar partidas por nombre:** Muestra todas las partidas registradas bajo ese nombre.
+5. **Buscar por puntaje:** Ordena la lista y muestra la posición y el nombre de cada jugador que tenga ese puntaje.
+6. **Salir:** Termina el programa.
 
 ---
 
-## Instrucciones para compilar y ejecutar
+## Entradas y salidas
 
-### Compilación
-```bash
-g++ -std=c++17 main.cpp -o avance2
-```
+### Entradas
+* **Archivo `jugs.txt`:** Se lee al iniciar. Tiene una línea por partida con el formato `nombre puntaje` (el nombre va sin espacios):
+  ```text
+  Ernesto 2350
+  Lalo 1450
+  Julio 1000
+  Raul 0
+  Lalo 1750
+  ```
+* **Teclado:**
+  * Opción del menú: un número del `1` al `6` (si escribes otra cosa el programa vuelve a preguntar).
+  * Nombre del jugador: una palabra sin espacios.
+  * Movimientos del juego: `w` (arriba), `a` (izquierda), `s` (abajo), `d` (derecha).
+  * Puntaje a buscar: un número entero.
 
-### Ejecución
-```bash
-./avance2
-```
-(En Windows: `avance3.exe`). Asegúrate de que `jugadores.txt` esté en la carpeta desde la que ejecutas.
+### Salidas
+* El mapa de `8x8` en cada turno, el combustible restante y el puntaje final de la partida.
+* Listados del Top 10, del historial reciente y de los resultados de las búsquedas.
+* Mensajes de aviso cuando no hay datos o no se encuentra lo buscado.
+* El archivo `jugs.txt` actualizado con todas las partidas después de cada partida jugada.
 
 ---
 
-## Cumplimiento de las Sub-competencias
+## Estructura de archivos
+
+* **`main.cpp`**: Menú principal, validación de entradas y flujo del programa.
+* **`player.h`**: Clase `Player` (nombre y puntaje), *getters* y sobrecarga de `>=`.
+* **`dlist.h`**: Lista doblemente ligada (`DList`) y su iterador (`DListIterator`).
+* **`scores.h`**: Clase plantilla `Sorts<T>` con Merge Sort para `DList`.
+* **`busquedas.h`**: Búsqueda secuencial por nombre y por puntaje.
+* **`archivo.h`**: Lectura (`cargarArchivo`) y escritura (`guardarArchivo`) de `jugs.txt`.
+* **`game.h`**: Lógica del juego de navegación espacial y cálculo del puntaje.
+* **`jugs.txt`**: Archivo donde se guardan las partidas.
+
+---
+
+## Desarrollo de competencias
+
+> **Notación:** $n$ es el número de partidas guardadas en la lista.
 
 ### SICT0301: Evalúa los componentes
 
-#### Análisis de complejidad de las estructuras de datos
+#### 1. Análisis de complejidad del algoritmo de ordenamiento
+El único algoritmo de ordenamiento del proyecto es **Merge Sort** (`scores.h`), aplicado a la lista doblemente ligada:
 
-1. **Vector (`vector<Player> listaJugadores`):**
-   - `push_back`: mejor y promedio $O(1)$; peor caso $O(n)$ cuando se redimensiona y copia los elementos (amortizado $O(1)$).
-   - Acceso por índice: $O(1)$ en todos los casos.
-   - Recorrido completo: $O(n)$.
-   - Complejidad espacial: $O(n)$.
+| Función | ¿Qué hace? | Mejor caso | Caso promedio | Peor caso |
+| :--- | :--- | :---: | :---: | :---: |
+| `mergeList` | Mezcla dos listas ya ordenadas en una nueva, recorriéndolas con iteradores | $O(n)$ | $O(n)$ | $O(n)$ |
+| `mergeSplit` | Divide la lista en dos mitades, ordena cada una recursivamente y las mezcla | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
+| `mergeSort` | Llama a `mergeSplit` | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
 
-2. **Fila circular (`Player data[MAX_HISTORIAL]`, con `MAX_HISTORIAL = 5`):**
+* **Explicación:** En cada llamada, dividir la lista cuesta $O(n)$ (se recorre para copiar cada mitad) y mezclar cuesta $O(n)$. Cada nivel de recursión divide el tamaño a la mitad, así que hay $\log n$ niveles: $T(n) = 2T(n/2) + O(n) = O(n \log n)$.
+* **Consistencia:** El tiempo no depende del orden inicial de los datos (la lista siempre se divide y se mezcla completa), por eso los tres casos son iguales.
+* **Espacio extra:** $O(n)$ por las listas auxiliares que se crean al dividir y mezclar, más $O(\log n)$ de pila de recursión.
+* **Dónde se observa:** `scores.h`, con el análisis línea por línea en los comentarios.
 
-   | Operación | Mejor | Promedio | Peor |
-   |:---|:---|:---|:---|
-   | `enqueue`, `dequeue`, `front` | $O(1)$ | $O(1)$ | $O(1)$ |
-   | `empty`, `full`, `clear` | $O(1)$ | $O(1)$ | $O(1)$ |
-   | `add` (`dequeue` si está llena + `enqueue`) | $O(1)$ | $O(1)$ | $O(1)$ |
-   | `print` | $O(1)$ | $O(1)$ | $O(1)$ (recorre máximo 5 elementos) |
+#### 2. Análisis de complejidad de la estructura de datos
+La única estructura de datos es la lista doblemente ligada `DList<Player>` con su iterador (`dlist.h`):
 
-   Complejidad espacial: $O(1)$, porque la memoria está acotada a 5 elementos `Player`.
+| Operación | Mejor caso | Caso promedio | Peor caso |
+| :--- | :---: | :---: | :---: |
+| `add`, `addFirst` (agregar) | $O(1)$ | $O(1)$ | $O(1)$ |
+| `empty`, `length` | $O(1)$ | $O(1)$ | $O(1)$ |
+| Iterador: `begin`, `operator()`, `operator++` | $O(1)$ | $O(1)$ | $O(1)$ |
+| Constructor copia y `operator=` | $O(n)$ | $O(n)$ | $O(n)$ |
+| `clear` y destructor `~DList` | $O(n)$ | $O(n)$ | $O(n)$ |
 
-3. **Lectura del archivo (`cargarArchivo`):** $O(n)$ en todos los casos, con $n$ el número de líneas, y un `push_back` amortizado $O(1)$ por línea.
+* `add` es $O(1)$ en todos los casos porque la lista guarda `tail` y no tiene que recorrerse para llegar al final. Complejidad espacial de la lista: $O(n)$.
 
-#### Análisis de complejidad de los algoritmos
+**Usos de la estructura en el programa:**
 
-| Algoritmo | Mejor | Promedio | Peor |
-|:---|:---|:---|:---|
-| Merge Sort (`mergeSort`) | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ |
-| Búsqueda binaria recursiva (`bs_rec` / `bs_aux`) | $O(1)$ | $O(\log n)$ | $O(\log n)$ |
-| Búsqueda secuencial (`bs_seq`) | $O(1)$ | $O(n)$ | $O(n)$ |
-| Recorrido de vecinos con el mismo puntaje | $O(1)$ | $O(1)$ | $O(n)$ (si todos tienen el mismo puntaje) |
-| `Game::play` | $O(1)$ | $O(1)$ | $O(1)$ (máximo 15 movimientos) |
+| Uso | Operaciones de la lista | Complejidad |
+| :--- | :--- | :---: |
+| Cargar `jugs.txt` (`cargarArchivo`) | `add` por cada línea | $O(n)$ |
+| Registrar una partida (Opción 1) | `add` | $O(1)$ |
+| Ordenar para *leaderboard* y búsqueda por puntaje (Opciones 2 y 5) | Copias, `add` e iteradores dentro de Merge Sort | $O(n \log n)$ |
+| Mostrar el Top 10 (Opción 2) | Iterador, máximo 10 elementos | $O(1)$ |
+| Historial reciente (Opción 3) | Iterador: saltar $n - 5$ elementos y mostrar 5 | $O(n)$ |
+| Buscar por nombre y por puntaje (Opciones 4 y 5) | Iterador recorriendo toda la lista | $O(n)$ |
+| Guardar `jugs.txt` (`guardarArchivo`) | Iterador recorriendo toda la lista | $O(n)$ |
+| Liberar la memoria al terminar | Destructor | $O(n)$ |
 
-- **Merge Sort:** `mergeSplit` divide el vector recursivamente en mitades ($\log n$ niveles) y `mergeArray` combina las partes con un recorrido lineal $O(n)$.
-- **Búsqueda binaria:** descarta la mitad de la lista en cada llamada recursiva. Funciona porque la lista está ordenada de mayor a menor.
-- **Opción 4 completa:** como se ordena antes de buscar, cuesta $O(n \log n)$ (ordenar) + $O(\log n)$ (buscar) + $O(n)$ en el peor caso (vecinos con el mismo puntaje), es decir, $O(n \log n)$.
-- **Complejidad final del programa:** las operaciones del historial son $O(1)$ y las búsquedas son menores o iguales a $O(n \log n)$, por lo que la operación dominante es el ordenamiento: **$O(n \log n)$**.
+* **Dónde se observa:** `dlist.h` (con la complejidad de cada método en los comentarios) y en `main.cpp`, `busquedas.h` y `archivo.h`.
+
+#### 3. Análisis de los demás componentes y complejidad final del programa
+
+| Componente | Mejor caso | Caso promedio | Peor caso |
+| :--- | :---: | :---: | :---: |
+| `Player` (constructor, *getters*, `operator>=`) | $O(1)$ | $O(1)$ | $O(1)$ |
+| `leerEntero` | $O(1)$ | $O(1)$ | $O(1)$ |
+| `Game::play` (máximo 15 movimientos sobre un mapa fijo de `8x8`) | $O(1)$ | $O(1)$ | $O(1)$ |
+| `buscarPorNombre` (recorre toda la lista, muestra todas las coincidencias) | $O(n)$ | $O(n)$ | $O(n)$ |
+| `buscarPorPuntaje` (recorre toda la lista, muestra todas las coincidencias) | $O(n)$ | $O(n)$ | $O(n)$ |
+| `cargarArchivo` | $O(n)$ | $O(n)$ | $O(n)$ |
+| `guardarArchivo` | $O(n)$ | $O(n)$ | $O(n)$ |
+
+**Complejidad de cada opción del menú:**
+* **Al iniciar (cargar archivo):** $O(n)$
+* **1. Jugar:** $O(n)$ (jugar y agregar son $O(1)$, guardar el archivo es $O(n)$)
+* **2. Ver Leaderboard:** $O(n \log n)$ (ordenar) + $O(1)$ (Top 10) = $O(n \log n)$
+* **3. Ver Historial reciente:** $O(n)$
+* **4. Buscar partidas por nombre:** $O(n)$
+* **5. Buscar por puntaje:** $O(n \log n)$ (ordenar) + $O(n)$ (buscar) = $O(n \log n)$
+
+**Complejidad final del programa:**
+* **Tiempo:** **$O(n \log n)$**, porque la operación más costosa es el ordenamiento con Merge Sort; todo lo demás es $O(n)$ o menor.
+* **Espacio:** **$O(n)$**, por la lista de partidas, la copia ordenada y las listas auxiliares del Merge Sort.
 
 ---
 
 ### SICT0302: Toma decisiones
 
-1. **Vector para todos los jugadores:** crece dinámicamente, agregar al final es $O(1)$ amortizado y permite el acceso por índice que necesita la búsqueda binaria.
+#### Algoritmo de ordenamiento
+Usé **Merge Sort** para ordenar las partidas por puntaje de mayor a menor porque:
+* Garantiza $O(n \log n)$ en todos los casos; algoritmos como Bubble Sort o Selection Sort son $O(n^2)$ y se volverían lentos con muchas partidas.
+* Solo necesita recorrer las listas de principio a fin sin acceder a posiciones intermedias, lo que lo hace ideal para una lista ligada (otros algoritmos como Quick Sort dependen del acceso directo por índice).
+* Es estable: en un empate (`>=`) se toma primero el elemento de la izquierda, así que las partidas con el mismo puntaje conservan su orden cronológico.
+* Se aplica sobre una copia de la lista y no sobre la original, porque la original debe conservar el orden cronológico para el historial y para guardar el archivo.
 
-2. **Fila circular para el historial:** solo interesan las últimas $N$ partidas y la más antigua debe salir primero, que es el comportamiento FIFO de una fila. Con un arreglo circular, `enqueue` y `dequeue` son $O(1)$ y la memoria queda acotada. Un vector ilimitado consumiría memoria creciente, y eliminar el primer elemento costaría $O(n)$ por los desplazamientos.
+*Dónde se observa:* `scores.h` y su uso en `main.cpp` (opciones 2 y 5).
 
-3. **Merge Sort para el leaderboard:** garantiza $O(n \log n)$ en todos los casos, a diferencia de Bubble Sort o Selection Sort ($O(n^2)$). Además es estable: conserva el orden de registro entre jugadores con el mismo puntaje.
+#### Estructura de datos
+Usé una **lista doblemente ligada (`DList`)** para guardar todas las partidas porque:
+* Es dinámica: no se sabe cuántas partidas se jugarán, y la lista crece un nodo a la vez sin tamaño fijo ni copias por redimensionar como pasa en un `vector`.
+* Agregar al final es $O(1)$ gracias a `tail`, que es la operación más frecuente (cada partida nueva).
+* Una sola estructura sirve para todo: el *leaderboard*, el historial y las búsquedas salen de la misma lista, en lugar de mantener datos duplicados en un vector y en una fila circular de tamaño fijo.
+* Todo el recorrido se hace con `DListIterator`, que avanza elemento por elemento en $O(1)$ sin exponer los nodos.
+* *Limitación / mejora a futuro:* el puntero `previous` de cada nodo no se aprovecha en las consultas actuales ya que el iterador solo avanza hacia adelante, pero permitiría recorrer el historial desde el final hacia atrás en $O(1)$ o eliminar nodos en $O(1)$.
 
-4. **Búsqueda binaria recursiva por puntaje:** la lista ya se ordena con Merge Sort, así que se puede descartar la mitad en cada paso: $O(\log n)$ en lugar de $O(n)$.
-
-5. **Búsqueda secuencial por nombre:** la lista está ordenada por puntaje y no por nombre, por lo que no se puede usar búsqueda binaria. Hay que revisar elemento por elemento: $O(n)$.
+*Dónde se observa:* `dlist.h` y su uso en `main.cpp`, `scores.h`, `busquedas.h` y `archivo.h`.
 
 ---
 
 ### SICT0303: Implementa acciones científicas
 
-1. **Mecanismos para consultar información de las estructuras:**
-   - **Leaderboard:** `mergeSort()` genera una copia ordenada del vector y se despliega con un ciclo $O(n)$.
-   - **Historial (`Historial::print`):** recorre la fila circular desde `head` avanzando con `(i + 1) % MAX_HISTORIAL`, preservando el orden FIFO.
-   - **Búsqueda por puntaje:** `bs_rec` consulta la lista ordenada en $O(\log n)$.
-   - **Búsqueda por nombre:** `bs_seq` consulta la lista sin ordenar en $O(n)$.
-
-2. **Mecanismos de lectura de archivos para cargar datos a las estructuras:**
-   - Al iniciar, `cargarArchivo` abre `jugadores.txt`, lee cada línea (`nombre puntaje`) y crea un `Player` por línea con `push_back` sobre `listaJugadores`.
-   - Estos jugadores se usan en el leaderboard y en ambas búsquedas, igual que los jugadores registrados durante la partida.
-   - Durante la ejecución, el nombre ingresado por consola y el puntaje de `game.play()` también se cargan al vector (`push_back`) y a la fila del historial (`historial.add`).
+* **Consultas sobre la estructura (`main.cpp` y `busquedas.h`):**
+  * **Leaderboard (Opción 2):** `mergeSort` genera una copia ordenada de la lista y se recorre con un iterador para mostrar el Top 10.
+  * **Historial reciente (Opción 3):** Se recorre la lista con un iterador saltando las partidas viejas y se muestran las últimas 5.
+  * **Buscar por nombre (Opción 4):** `buscarPorNombre` recorre la lista y muestra todas las partidas del jugador.
+  * **Buscar por puntaje (Opción 5):** `buscarPorPuntaje` recorre la lista ordenada y muestra la posición y el nombre de cada jugador con ese puntaje.
+* **Lectura de archivos (`cargarArchivo` en `archivo.h`):** Abre `jugs.txt` al iniciar y lee cada línea (`nombre puntaje`) con `archivo >> nombre >> puntos`. Por cada línea crea un `Player` y lo agrega a la lista con `add`. Si el archivo no existe, la lista empieza vacía. Como se cargan en el mismo orden en que se guardaron, se conserva el orden cronológico.
+* **Escritura de archivos (`guardarArchivo` en `archivo.h`):** Se llama después de cada partida. Recorre la lista con un iterador y escribe cada partida en una línea (`nombre puntaje`) de `jugs.txt`. Como se escribe el contenido completo de la lista, el archivo siempre es un reflejo exacto de la estructura en memoria.
 
 ---
 
-## Créditos y Reconocimientos
-- **Lógica del Juego (`game.h`):** el código base de la lógica del juego de navegación espacial fue desarrollado con apoyo de Gemini para la simulación de cuadrícula en consola, bajo autorización del profesor para la exploración de la mecánica de juego.
+## Créditos y reconocimientos
+
+* **Lógica del juego (`game.h`):** El código base de la simulación de cuadrícula en consola fue desarrollado con apoyo de **Gemini**, bajo autorización del profesor para explorar la mecánica del juego.
+* **Revisión y apoyo en el resto del proyecto:** Utilicé **Claude (Anthropic)** como apoyo para revisar el código, adaptarlo a la lista doblemente ligada vista en clase y estructurar el análisis de complejidad de este README.
