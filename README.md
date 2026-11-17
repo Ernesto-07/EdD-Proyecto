@@ -235,5 +235,4 @@ Usé una **lista doblemente ligada (`DList`)** para guardar todas las partidas p
 
 ## Créditos y reconocimientos
 
-* **Lógica del juego (`game.h`):** El código base de la simulación de cuadrícula en consola fue desarrollado con apoyo de **Gemini**, bajo autorización del profesor para explorar la mecánica del juego.
-* **Revisión y apoyo en el resto del proyecto:** Utilicé **Claude (Anthropic)** como apoyo para revisar el código, adaptarlo a la lista doblemente ligada vista en clase y estructurar el análisis de complejidad de este README.
+* **Lógica del juego (`game.h`):** El código base de la simulación de cuadrícula en consola fue desarrollado con apoyo de **Gemini**, bajo autorización del profesor para hacer la mecánica del juego.
