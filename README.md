@@ -113,18 +113,6 @@ Selecciona una opcion:
 
 ---
 
-## Estructura de archivos
-
-* **`main.cpp`**: Menú principal, valida entradas y corre el programa.
-* **`player.h`**: Clase `Player`, getters y sobrecarga de `>=`.
-* **`dlist.h`**: Lista doblemente ligada (`DList`) y su iterador (`DListIterator`).
-* **`scores.h`**: Clase `Sorts<T>` con Merge Sort para `DList`.
-* **`busquedas.h`**: Búsqueda por nombre y por puntaje.
-* **`archivo.h`**: Lectura (`cargarArchivo`) y escritura (`guardarArchivo`) de `jugs.txt`.
-* **`game.h`**: El juego hecho por gemini.
-* **`jugs.txt`**: Archivo donde se guardan las partidas.
-
----
 
 ## Desarrollo de competencias
 
@@ -207,7 +195,7 @@ Usé **Merge Sort** para ordenar las partidas por puntaje de mayor a menor porqu
 * Es estable: en un empate (`>=`) se toma primero el elemento de la izquierda, así que las partidas con el mismo puntaje conservan su orden cronológico.
 * Se aplica sobre una copia de la lista y no sobre la original, porque la original debe conservar el orden cronológico para el historial y para guardar el archivo.
 
-*Dónde se observa:* `scores.h` y su uso en `main.cpp` (opciones 2 y 5).
+*Se observa:* `scores.h` y su uso en `main.cpp`.
 
 #### Estructura de datos
 Usé una **lista doblemente ligada (`DList`)** para guardar todas las partidas porque:
@@ -217,7 +205,7 @@ Usé una **lista doblemente ligada (`DList`)** para guardar todas las partidas p
 * Todo el recorrido se hace con `DListIterator`, que avanza elemento por elemento en $O(1)$ sin exponer los nodos.
 * *Limitación / mejora a futuro:* el puntero `previous` de cada nodo no se aprovecha en las consultas actuales ya que el iterador solo avanza hacia adelante, pero permitiría recorrer el historial desde el final hacia atrás en $O(1)$ o eliminar nodos en $O(1)$.
 
-*Dónde se observa:* `dlist.h` y su uso en `main.cpp`, `scores.h`, `busquedas.h` y `archivo.h`.
+*Se observa:* `dlist.h` y su uso en `main.cpp`, `scores.h`, `busquedas.h` y `archivo.h`.
 
 ---
 
