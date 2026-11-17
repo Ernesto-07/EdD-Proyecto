@@ -8,7 +8,7 @@
 
 Este proyecto es un juego de consola en C++ donde controlas una nave en una cuadrícula de `8x8` y tienes que llegar a la base antes de quedarte sin combustible.
 
-Los resultados de todas las partidas se van guardando en una estructura de datos dinámica, se ordenan para armar un *leaderboard*, se pueden consultar de distintas formas y se guardan en un archivo de texto (`jugs.txt`) para que no se pierdan al cerrar el programa.
+Los resultados de todas las partidas se van guardando en una estructura de datos dinámica, se ordenan para armar un leaderboard, se pueden consultar de distintas formas y se guardan en un archivo de texto (`jugs.txt`) para que no se pierdan al cerrar el programa.
 
 Cada partida se representa con la clase `Player`, que guarda:
 * **Nombre del jugador** (`string`)
@@ -16,11 +16,11 @@ Cada partida se representa con la clase `Player`, que guarda:
 
 ---
 
-## Evolución del proyecto
+## Avances
 
 ### Avance 1
 * Guardado de las puntuaciones en un `vector<Player>`.
-* Ordenamiento del *leaderboard* de mayor a menor puntaje usando la clase `Sorts<T>` con Merge Sort y la sobrecarga del operador `>=` de `Player`.
+* Ordenamiento del leaderboard de mayor a menor puntaje usando la clase `Sorts<T>` con Merge Sort y la sobrecarga del operador `>=` de `Player`.
 * Lógica del juego interactivo en consola (`game.h`).
 
 ### Avance 2
@@ -30,37 +30,34 @@ Cada partida se representa con la clase `Player`, que guarda:
 * El menú pasó de 4 a 6 opciones.
 
 **Cambios respecto al Avance 1:**
-1. **Historial con fila circular:** Para ver las últimas partidas jugadas. Usé una fila porque la más antigua debe ir saliendo primero (FIFO).
-2. **Búsquedas (`busquedas.h`):** Para consultar partidas por puntaje o por nombre, además del *leaderboard*.
+1. **Historial con pila:** Para ver las últimas partidas jugadas. Usé una pila porque la más antigua debe ir saliendo primero.
+2. **Búsquedas (`busquedas.h`):** Para consultar partidas por puntaje o por nombre, además del leaderboard.
 3. **Lectura de archivo:** Para mantener las partidas de sesiones anteriores al volver a abrir el programa.
 4. **Menú de 6 opciones:** Se agregaron el historial y las dos búsquedas.
 
 ### Avance 3 (Actual)
-En este avance ya tengo la aplicación completa funcionando: carga datos, los organiza, permite hacer consultas y guarda todo automáticamente.
+En este avance ya tengo la aplicación completa funcionando, ya carga datos, los organiza, y deja hacer consultas y guarda todo.
 
-* **Cambio de estructura de datos:** Reemplacé el `vector<Player>` y la fila circular del historial por una sola lista doblemente ligada (`DList<Player>` en `dlist.h`), recorrida con un iterador (`DListIterator`). Esta única lista guarda todas las partidas en orden cronológico y de ahí salen el *leaderboard*, el historial y las búsquedas (ya no se usa `enqueue` ni fila).
+* **Cambio de estructura de datos:** Reemplacé el `vector<Player>` y la fila circular del historial por una sola lista doblemente ligada (`DList<Player>` en `dlist.h`), recorrida con un iterador (`DListIterator`). Esta única lista guarda todas las partidas en orden cronológico y de ahí salen el leaderboard, el historial y las búsquedas (ya no se usa `enqueue`).
 * **Merge Sort sobre la lista:** Adapté `Sorts<T>` para ordenar `DList<T>` dividiendo la lista en dos mitades, ordenando cada una y mezclándolas con iteradores.
 * **Escritura de archivo:** Después de cada partida, `guardarArchivo` escribe en `jugs.txt` todas las partidas actuales de la lista.
-* **Consultas:** *Leaderboard* (Top 10), historial reciente, partidas de un jugador por nombre y búsqueda por puntaje.
+* **Consultas:** Leaderboard (Top 10), historial reciente, partidas de un jugador por nombre y búsqueda por puntaje.
 * **Validación de entradas:** Si en el menú se escribe una letra o algo que no sea un número, el programa avisa y vuelve a preguntar sin ciclarse.
-* **Análisis de complejidad:** Documenté la complejidad de todos los componentes y la complejidad final del programa (ver sección de competencias).
+* **Análisis de complejidad:** Puse la complejidad de todos los componentes y la complejidad final del programa.
 
 **Cambios respecto al Avance 2:**
-1. **Lista doblemente ligada en lugar de vector y fila circular:** La fila era de tamaño fijo (5) y solo servía para el historial, además de que tener dos estructuras separadas duplicaba los datos. Con la lista doblemente ligada todo vive en un solo lugar, crece dinámicamente nodo por nodo sin tener que redimensionar ni copiar arreglos, y agrega al final en $O(1)$ gracias al puntero `tail`.
+1. **Lista doblemente ligada en lugar de vector y pila:** La pila era de tamaño fijo (5) y solo servía para el historial, además de que tener dos estructuras separadas duplicaba los datos. Con la lista doblemente ligada todo esta en un solo lugar, crece dinámicamente nodo por nodo sin tener que redimensionar ni copiar arreglos, y agrega al final en $O(1)$ gracias al puntero `tail`.
 2. **Eliminación de `historial.h`:** Ahora el historial simplemente toma las últimas 5 partidas de la lista. Como la lista se carga desde el archivo, el historial también muestra partidas de ejecuciones anteriores (antes solo mostraba las de la sesión actual).
-3. **Eliminación de la búsqueda binaria:** La búsqueda binaria necesita saltar directo a la mitad de los datos, pero en una lista ligada llegar al elemento de en medio cuesta $O(n)$, así que dejaba de ser $O(\log n)$. Cambié a búsqueda secuencial.
-4. **Búsqueda por nombre completa:** Ahora muestra todas las partidas de un jugador y no solo la primera que encontraba, para que pueda ver todo su historial.
-5. **Leaderboard limitado al Top 10:** Antes mostraba todas las partidas; ahora muestra únicamente las 10 mejores puntuaciones.
-6. **Guardado automático (`guardarArchivo`):** Antes el programa solo leía `jugs.txt` y las partidas nuevas se perdían al cerrar.
-7. **Corrección en la complejidad del historial:** Imprimir el historial cuesta $O(n)$ y no $O(1)$, porque hay que recorrer la lista para llegar a los últimos 5 nodos.
-8. **Validación en el menú (`leerEntero`):** Evita que el programa entre en un ciclo infinito si el usuario escribe texto en lugar de un número.
-9. **Reordenamiento del menú:** La opción 4 ahora es buscar por nombre y la 5 buscar por puntaje.
+3. **Búsqueda por nombre completa:** Ahora muestra todas las partidas de un jugador y no solo la primera que encontraba, para que pueda ver todo su historial.
+4. **Leaderboard limitado al Top 10:** Antes mostraba todas las partidas; ahora muestra únicamente las 10 mejores puntuaciones.
+5. **Guardado automático (`guardarArchivo`):** Antes el programa solo leía `jugs.txt` y las partidas nuevas se perdían al cerrar.
+6. **Corrección en la complejidad del historial:** Imprimir el historial cuesta $O(n)$ y no $O(1)$, porque hay que recorrer la lista para llegar a los últimos 5 nodos.
+7. **Validación en el menú (`leerEntero`):** Evita que el programa entre en un ciclo infinito si el usuario escribe texto en lugar de un número.
+8. **Reordenamiento del menú:** La opción 4 ahora es buscar por nombre y la 5 buscar por puntaje.
 
 ### Entrega final
-*(Pendiente: se completará en la entrega final).*
 
 **Cambios respecto al Avance 3:**
-*(Pendiente: se completará en la entrega final).*
 
 ---
 
@@ -71,20 +68,6 @@ Ejecuta el siguiente comando en la terminal dentro de la carpeta del proyecto:
 ```bash
 g++ main.cpp -std=c++11 -o final
 ```
-
-### Ejecutar
-* **Linux / Mac:**
-  ```bash
-  ./final
-  ```
-* **Windows:**
-  ```bash
-  final.exe
-  ```
-
-> **Nota:** El archivo `jugs.txt` debe estar en la carpeta desde la que se ejecuta el programa. Si todavía no existe, el programa empieza con la lista vacía y lo crea automáticamente al terminar la primera partida.
-
----
 
 ## ¿Cómo usar el programa?
 
@@ -101,9 +84,9 @@ Al ejecutar el programa aparece el menú principal en consola:
 Selecciona una opcion: 
 ```
 
-1. **Jugar:** Te pide tu nombre y empieza la partida. Controlas la nave `[^]` en una cuadrícula de `8x8` y debes llegar a la base `(H)` usando las teclas `w`, `a`, `s`, `d` con un límite de 15 movimientos de combustible. Si llegas, el puntaje es `movimientos_restantes * 150 + 1000`; si te quedas sin combustible, es `0`. Al terminar, la partida se agrega a la lista y se guarda en `jugs.txt`.
+1. **Jugar:** Te pide tu nombre y empieza la partida. Juegas con la nave `[^]` en una cuadrícula de `8x8` y debes llegar a la base `(H)` usando las teclas `w`, `a`, `s`, `d` con un límite de 15 movimientos de combustible. Si llegas el puntaje es `movimientos_restantes * 150 + 1000`; si te quedas sin combustible, es `0`. Al terminar, la partida se agrega a la lista y se guarda en `jugs.txt`.
 2. **Ver Leaderboard:** Ordena una copia de todas las partidas con Merge Sort y muestra el Top 10 de mayor a menor puntaje.
-3. **Ver Historial reciente:** Muestra las últimas 5 partidas registradas, de la más vieja a la más reciente (incluyendo las cargadas del archivo).
+3. **Ver Historial reciente:** Muestra las últimas 5 partidas registradas, de la más vieja a la más reciente.
 4. **Buscar partidas por nombre:** Muestra todas las partidas registradas bajo ese nombre.
 5. **Buscar por puntaje:** Ordena la lista y muestra la posición y el nombre de cada jugador que tenga ese puntaje.
 6. **Salir:** Termina el programa.
@@ -115,17 +98,12 @@ Selecciona una opcion:
 ### Entradas
 * **Archivo `jugs.txt`:** Se lee al iniciar. Tiene una línea por partida con el formato `nombre puntaje` (el nombre va sin espacios):
   ```text
-  Ernesto 2350
+  Raul 1750
+  Julio 2200
+  Cesar 1900
   Lalo 1450
-  Julio 1000
-  Raul 0
-  Lalo 1750
+
   ```
-* **Teclado:**
-  * Opción del menú: un número del `1` al `6` (si escribes otra cosa el programa vuelve a preguntar).
-  * Nombre del jugador: una palabra sin espacios.
-  * Movimientos del juego: `w` (arriba), `a` (izquierda), `s` (abajo), `d` (derecha).
-  * Puntaje a buscar: un número entero.
 
 ### Salidas
 * El mapa de `8x8` en cada turno, el combustible restante y el puntaje final de la partida.
@@ -137,13 +115,13 @@ Selecciona una opcion:
 
 ## Estructura de archivos
 
-* **`main.cpp`**: Menú principal, validación de entradas y flujo del programa.
-* **`player.h`**: Clase `Player` (nombre y puntaje), *getters* y sobrecarga de `>=`.
+* **`main.cpp`**: Menú principal, valida entradas y corre el programa.
+* **`player.h`**: Clase `Player`, getters y sobrecarga de `>=`.
 * **`dlist.h`**: Lista doblemente ligada (`DList`) y su iterador (`DListIterator`).
-* **`scores.h`**: Clase plantilla `Sorts<T>` con Merge Sort para `DList`.
-* **`busquedas.h`**: Búsqueda secuencial por nombre y por puntaje.
+* **`scores.h`**: Clase `Sorts<T>` con Merge Sort para `DList`.
+* **`busquedas.h`**: Búsqueda por nombre y por puntaje.
 * **`archivo.h`**: Lectura (`cargarArchivo`) y escritura (`guardarArchivo`) de `jugs.txt`.
-* **`game.h`**: Lógica del juego de navegación espacial y cálculo del puntaje.
+* **`game.h`**: El juego hecho por gemini.
 * **`jugs.txt`**: Archivo donde se guardan las partidas.
 
 ---
