@@ -179,8 +179,8 @@ La única estructura de datos es la lista doblemente ligada `DList<Player>` con 
 | `Player` (constructor, *getters*, `operator>=`) | $O(1)$ | $O(1)$ | $O(1)$ |
 | `leerEntero` | $O(1)$ | $O(1)$ | $O(1)$ |
 | `Game::play` (máximo 15 movimientos sobre un mapa fijo de `8x8`) | $O(1)$ | $O(1)$ | $O(1)$ |
-| `buscarPorNombre` (recorre toda la lista, muestra todas las coincidencias) | $O(n)$ | $O(n)$ | $O(n)$ |
-| `buscarPorPuntaje` (recorre toda la lista, muestra todas las coincidencias) | $O(n)$ | $O(n)$ | $O(n)$ |
+| `buscarPorNombre` (recorre toda la lista) | $O(n)$ | $O(n)$ | $O(n)$ |
+| `buscarPorPuntaje` (recorre toda la lista) | $O(n)$ | $O(n)$ | $O(n)$ |
 | `cargarArchivo` | $O(n)$ | $O(n)$ | $O(n)$ |
 | `guardarArchivo` | $O(n)$ | $O(n)$ | $O(n)$ |
 
